@@ -1,0 +1,245 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Account{
+    public:
+    int accountNumber;
+    string accountHolderName;
+    double balance;
+    string accountType;
+    vector<string> transactionHistory;
+    
+    public:
+    void createAccount(){
+        cout<<"\nAccount Number: ";
+        cin>>accountNumber;
+        cin.ignore();
+        cout<<"Account Holder Name: ";
+        getline(cin, accountHolderName);
+        cout<<"Account Type:";
+        cin>>accountType;
+        cout<<"balance:";
+        cin>>balance;
+        cout<<"Account Created successfully!"<<endl;
+        
+    }
+    
+    void displayAccountDetails(){
+        cout<<"\nAccount Details"<<endl;
+        cout<<"Account Number: "<<accountNumber<<endl;
+        cout<<"Account Holder Name: " << accountHolderName<<endl;
+        cout<<"Balance: "<<balance<<endl;
+        cout<<"Account Type: "<<accountType<<endl;  
+    }
+    
+    void updateAccounts(const string& accountHolderName, const string& accountType,double balance){
+        this->accountHolderName=accountHolderName;
+        this->accountType=accountType;
+        this->balance=balance;
+        cout<<"Account updated successfully!"<<endl;
+    }
+    
+    void deposit(double amount){
+        balance += amount;
+        transactionHistory.push_back("Deposited: " + to_string(amount));
+        cout<<"Deposit successful!"<<endl;
+    }
+    
+    void withdraw(double amount){
+        if(amount <= balance) {
+            balance -= amount;
+            transactionHistory.push_back("Withdrew: " + to_string(amount));
+            cout<<"Withdrawal successful!"<<endl<<"Available Balance:"<<balance<<endl;
+        }else{
+            cout<<"\nInsufficient balance!"<<endl;
+        }
+    }
+    void showTransactionHistory() {
+           cout<<"\nTransaction History for Account Number:"<<accountNumber<<endl;
+        for(const string& transaction : transactionHistory) {
+           cout<<transaction<<endl;
+        }
+    }
+};
+
+class Bank {
+    private:
+    vector<Account> accounts;
+    
+    public:
+    void addAccount(){
+        Account newAccount;
+        newAccount.createAccount();
+        accounts.push_back(newAccount);
+    } 
+    void deleteAccount(int number){
+        for(auto i=accounts.begin();i!=accounts.end();i++){
+           if(i->accountNumber==number){
+              accounts.erase(i);
+              cout<<"Account deleted successfully!"<<endl;
+            return;
+            }
+        }
+            cout<<"\nAccount not found!"<<endl;
+    } 
+    
+    void updateAccount(int accountNum){
+        string name,type;
+        double bal;
+        for(auto& account : accounts){
+           if(account.accountNumber==accountNum){
+              cout<<"\nEnter new account details:\n";
+              cout<<"Account Holder Name: ";
+              cin.ignore();
+              getline(cin,name);
+              cout<<"Balance: ";
+              cin>>bal;
+              cout<<"Account Type: ";
+              cin>>type;
+              account.updateAccounts(name,type,bal);
+            return;
+            }
+        }
+            cout<<"\nAccount not found!"<<endl;
+    }
+    
+    void findAccount(int accountNum){
+        for(auto& account : accounts){
+           if(account.accountNumber==accountNum){
+              account.displayAccountDetails();
+            return;
+            }
+        }
+            cout<<"\nAccount not found!"<<endl;
+    }
+    
+    void Transaction(string type,int accountNum,double amount){
+        for(auto& account : accounts){
+           if(account.accountNumber==accountNum){
+             if(type=="D"|| type=="d"){
+                account.deposit(amount);
+              }else if(type=="W" ||type=="w"){
+                account.withdraw(amount);
+              return;
+              }else{
+                cout << "Invalid transaction type!" << endl;
+            }
+            return;
+        }
+        }
+        cout<<"\nAccount not found!"<<endl;
+    }
+    void balanceInquiry(int accountNum){
+        for (auto& account : accounts) {
+        if(account.accountNumber==accountNum){
+            cout<<"Available balance:"<<account.balance<<endl;
+            return;
+        }
+        }
+        cout<<"Withdrawal successful!"<<endl;
+    }
+    void showTransactionHistory(int accountNum) {
+        for (auto& account : accounts) {
+            if (account.accountNumber == accountNum) {
+                account.showTransactionHistory();
+                return;
+            }
+        }
+        cout << "Account not found!" << endl;
+    }
+};
+
+int Features(){
+    int choice;
+    cout<<"\n*******HDFC BANK*******"<<endl;
+    cout<<"1.Account Creation"<<endl;
+    cout<<"2.Account Management"<<endl;
+    cout<<"3.Transactions"<<endl;
+    cout<<"4.Balance Inquiry"<<endl;
+    cout<<"5.Transaction History"<<endl;
+    cout<<"6.Exit"<<endl;
+    cout<<"Enter your choice:";
+    cin>>choice;
+    return choice;
+}
+int main()
+{
+    int choice,accountNumber;
+    Bank bank;
+    string transactionType;
+    double amount;
+    
+    while(true){
+    choice=Features();
+    switch(choice){
+        case 1:
+            bank.addAccount(); 
+        break;
+        case 2:
+            cout<<"\nAccount Management"<<endl;
+            cout<<"1.Update Account"<<endl;
+            cout<<"2.Find Account"<<endl;
+            cout<<"3.Delete Account"<<endl;
+            cout<<"Enter choice: ";
+            cin>>choice;
+            switch(choice){
+                case 1:
+                    cout<<"Enter account number:";
+                    cin>>accountNumber;
+                    bank.updateAccount(accountNumber); 
+                break;
+                case 2:
+                    cout<<"Enter account number:";
+                    cin>>accountNumber;
+                    bank.findAccount(accountNumber);
+                break;
+                case 3:
+                    cout<<"\nEnter account number:";
+                    cin>>accountNumber;
+                    bank.deleteAccount(accountNumber);
+                break;
+            default:
+                cout<<"Invalid input"<<endl;
+            }
+        break;
+        case 3:
+            cout<<"\nTransaction"<<endl;
+            cout<<"1.Deposit"<<endl;
+            cout<<"2.withdrawal"<<endl;
+            cout<<"Enter transaction type(D/W): ";
+            cin>>transactionType;
+            cout<<"\nEnter account number"<<endl;
+            cin>>accountNumber;
+            cout<<"Enter amount: ";
+            cin>>amount;
+            bank.Transaction(transactionType,accountNumber,amount);
+        break;
+        case 4:
+            cout<<"\nEnter account number"<<endl;
+            cin>>accountNumber;
+            bank.balanceInquiry(accountNumber);
+        break;
+        case 5:
+            cout<<"Enter account number:";
+            cin>>accountNumber;
+            bank.showTransactionHistory(accountNumber);
+        break;
+        case 6:
+            cout<<"Exiting..."<<endl;
+                return 0;
+        break;
+    default:
+        cout<<"Invalid choice please! try again.";
+    }
+    }
+
+    return 0;
+}
+
+
+
+
+
+
